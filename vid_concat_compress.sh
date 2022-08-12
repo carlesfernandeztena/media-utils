@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ "$#" -ne 1 ]; then 
-    echo "Usage: $0 <dir_videos>"
+    echo "Usage: `basename $0` <dir_videos>"
     exit -1
 fi
 DIR=$1

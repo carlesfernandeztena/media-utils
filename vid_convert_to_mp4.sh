@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ "$#" -ne 2 ]; then 
-    echo "Usage: $0 input output.mp4"
+    echo "Usage: `basename $0` input output.mp4"
     exit -1
 fi
 IN=$1

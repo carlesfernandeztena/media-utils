@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ "$#" -ne 5 ]; then 
-    echo "Usage: $0 video startx starty w h"
+    echo "Usage: `basename $0` video startx starty w h"
     exit -1
 fi
 VID=$1

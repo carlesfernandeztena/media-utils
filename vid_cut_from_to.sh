@@ -1,5 +1,5 @@
 if [ "$#" -ne 3 ]; then 
-    echo "Usage: $0 <file> <from xx:xx:xx> <to xx:xx:xx>"
+    echo "Usage: `basename $0` <file> <from xx:xx:xx> <to xx:xx:xx>"
     exit -1
 fi
 FILE=$1

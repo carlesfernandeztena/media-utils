@@ -15,7 +15,7 @@ HAS_AUDIO=`ffprobe -i $IN_VIDEO1 -show_streams -select_streams a -loglevel error
 if [ ${#HAS_AUDIO} == 0 ]
 then 
     echo "No audio track detected, adding silent track..."
-    ffmpeg -i $IN_VIDEO1 -f lavfi -i anullsrc -vcodec copy -acodec aac -shortest audio_$IN_VIDEO1
+    ffmpeg -hide_banner -y -i $IN_VIDEO1 -f lavfi -i anullsrc -vcodec copy -acodec aac -shortest audio_$IN_VIDEO1
     IN_VIDEO1_MOD=audio_$IN_VIDEO1
 else
     IN_VIDEO1_MOD=$IN_VIDEO1

@@ -1,6 +1,6 @@
-#!/bin/bash
++#!/bin/bash
 if [ "$#" -ne 2 ]; then 
-    echo "Usage: $0 <text_label>"
+    echo "Usage: `basename $0` <text_label>"
     exit -1
 fi
 IN_VIDEO=$1
