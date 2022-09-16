@@ -12,14 +12,14 @@ def main(args):
     with open(args.json, "r") as file:
         jsonfile = json.load(file)
     N = int(jq.compile(".sequences | length").input(jsonfile).text())
-    total = 0
     for i in range(N):
-        dur = float(
-            jq.compile(f".sequences[{i}].parameters.avatar.value").input(jsonfile).text()
-        )  
-        print(f" #{i} - {dur}")
-        total = total + dur
-    print(f"Total duration = {total}")
+        avatar_text = (
+            jq.compile(f".sequences[{i}].parameters.avatar.value")
+            .input(jsonfile)
+            .text()
+        )
+        print(f" ({i+1}) {avatar_text}")
+    print()
 
 
 if __name__ == "__main__":
