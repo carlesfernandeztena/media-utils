@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 import argparse
 import json
-import re
 import shlex
 import subprocess
-import sys
 from pathlib import Path
 
 import jq
@@ -53,6 +51,11 @@ def main(args):
 
     with open(args.input, "r") as file:
         jsonfile = json.load(file)
+
+    # If global/sequences, take out the global/
+    if "config" in jsonfile and "sequences" in jsonfile["config"]:
+        jsonfile = jsonfile["config"]
+
     N = int(jq.compile(".sequences | length").input(jsonfile).text())
     for i in range(N):
         actor_video = f"avatars/{args.product}/{i+1}.webm"
