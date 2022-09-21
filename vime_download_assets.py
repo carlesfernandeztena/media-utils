@@ -10,7 +10,8 @@ import jq
 from vime_adapt_to_composer import remove_nlpmetadata
 
 # fmt: off
-ASSETS_DIR = "assets/"
+PUBLIC_PATH = "/home/carles/src/vime/vime-renderer/public"
+ASSETS_DIR = "temp_assets/"
 DOWNLOADABLE_EXTS = [".mp3", ".wav", ".webm", ".mp4", ".png", ".jpg", ".bmp", ".gif", ".jpeg", ".svg"]
 # fmt: on
 
@@ -28,9 +29,9 @@ def is_downloadable(s3_asset: str) -> bool:
     return False
 
 
-def replace_assets(d, out_dir: str, level: int = 1):
+def replace_assets(d, level: int = 1):
     """Iteratively replace S3 assets along the hierarchy"""
-    Path(out_dir / ASSETS_DIR).mkdir(parents=True, exist_ok=True)
+    Path(f"{PUBLIC_PATH}/{ASSETS_DIR}").mkdir(parents=True, exist_ok=True)
 
     if isinstance(d, dict):
         for key in list(d):
@@ -41,16 +42,17 @@ def replace_assets(d, out_dir: str, level: int = 1):
             ):
                 ##############################
                 # Download and replace asset
-                out_filename = f"{out_dir}/assets/{Path(d[key]).name}"
+                out_filename = f"{PUBLIC_PATH}/{ASSETS_DIR}/{Path(d[key]).name}"
                 download_asset(d[key], out_filename)
-                d[key] = out_filename
+                # in json, only include path after "public/"
+                d[key] = f"{ASSETS_DIR}/{Path(d[key]).name}"
                 ##############################
             elif isinstance(d[key], dict) or isinstance(d[key], list):
-                d[key] = replace_assets(d[key], out_dir, level + 1)
+                d[key] = replace_assets(d[key], level + 1)
     elif isinstance(d, list):
         for i, key in enumerate(d):
             if isinstance(d[i], dict) or isinstance(d[i], list):
-                d[i] = replace_assets(d[i], out_dir, level + 1)
+                d[i] = replace_assets(d[i], level + 1)
     return d
 
 
@@ -59,7 +61,6 @@ def main(args):
         raise Exception(f"Couldn't find JSON file: {args.input}")
     if args.output == None:
         args.output = args.input
-    out_dir = Path(args.output).parents[0]
 
     with open(args.input, "r") as file:
         jsonfile = json.load(file)
@@ -74,7 +75,7 @@ def main(args):
     N = int(jq.compile(".sequences | length").input(jsonfile).text())
     for _ in range(N):
         # remove NLP metadata fields
-        jsonfile = replace_assets(jsonfile, out_dir)
+        jsonfile = replace_assets(jsonfile)
 
     with open(args.output, "w") as out_file:
         json.dump(jsonfile, out_file, indent=4)

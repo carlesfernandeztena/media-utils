@@ -1,15 +1,14 @@
 #!/usr/bin/python3
 import argparse
 import json
-import re
 import shlex
 import subprocess
-import sys
 from pathlib import Path
 
 import jq
 
 ASSETS_PATH = "/home/carles/src/vime/vime-renderer/public"
+TUTORIAL_DIR = "/home/carles/src/vime/renderer/test/tutorial/"
 MEDIA_UTILS_PATH = "/home/carles/src/media-utils"
 TEXTS = [
     "Vime Studio Editor",
@@ -31,7 +30,9 @@ def main(args):
     if not Path(args.input).exists:
         raise Exception(f"Couldn't find JSON file: {args.input}")
     if args.output == None:
-        args.output = args.input
+        args.output = (
+            f"{TUTORIAL_DIR}/T{Path(args.input).name.split('_')[0]}_tutorial.json"
+        )
 
     with open(args.input, "r") as file:
         jsonfile = json.load(file)
@@ -68,7 +69,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-i", "--input", type=str, help="input JSON file", required=True
     )
+    parser.add_argument(
+        "-o", "--output", type=str, help="output JSON file", required=False
+    )
     args = parser.parse_args()
-    args.output = ASSETS_PATH + "/../" + Path(args.input).name[0:2] + "tutorial.json"
     print(args.output)
     main(args)
