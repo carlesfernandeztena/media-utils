@@ -12,3 +12,6 @@ RES_Y=`ffprobe -hide_banner -v error -select_streams v:0 -show_entries stream=wi
 FONTSIZE=$((RES_Y/15))
 
 ffmpeg -y -hide_banner -v warning -i ${IN_VIDEO} -vf "drawtext=fontfile=/path/to/font.ttf:text='$TEXT':fontcolor=white:fontsize=$FONTSIZE:box=1:boxcolor=black@0.5:boxborderw=5:x=(w-text_w)/2:y=4*(h-text_h)/5" -codec:a copy text_${IN_VIDEO}
+
+# With imagemagick:
+# convert -gravity Center -pointsize 20 -draw "text 0,0 'This is the text'" -background white -undercolor lightblue in.png out.png

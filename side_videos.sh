@@ -24,7 +24,7 @@ echo " :: Getting filenames as labels"
 EXTENSION="${IN_VIDEO1##*.}"
 TEXT1=${IN_VIDEO1%.*}
 TEXT2=${IN_VIDEO2%.*}
-TMP="tmpfile69.${EXTENSION}"
+TMP=$(mktemp XXXXXX.${EXTENSION})
 if [ $5 == "up" ]; then
     POS_Y="1*(h-text_h)/6"
 else
@@ -49,8 +49,6 @@ ffmpeg -hide_banner -loglevel error -y \
     -codec:a copy \
     -codec:v libx264 -crf 18 -preset slow \
     ${OUT_VIDEO}
-    
-rm -rf $TMP
-rm -rf audio_$IN_VIDEO1
+rm -rf audio_$IN_VIDEO1 $TMP
 
 echo ":: Created ${OUT_VIDEO}"
