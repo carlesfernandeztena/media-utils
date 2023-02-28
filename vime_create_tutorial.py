@@ -7,8 +7,9 @@ from pathlib import Path
 
 import jq
 
-ASSETS_PATH = "/home/carles/src/vime/vime-renderer/public"
-TUTORIAL_DIR = "/home/carles/src/vime/renderer/test/tutorial/"
+RENDERER_PATH = "/home/carles/src/vime-composer-service/renderer"
+ASSETS_PATH = RENDERER_PATH + "public"
+TUTORIAL_DIR = RENDERER_PATH + "test/tutorial/"
 MEDIA_UTILS_PATH = "/home/carles/src/media-utils"
 TEXTS = [
     "Vime Studio Editor",
@@ -31,7 +32,7 @@ def main(args):
         raise Exception(f"Couldn't find JSON file: {args.input}")
     if args.output == None:
         args.output = (
-            f"{TUTORIAL_DIR}/T{Path(args.input).name.split('_')[0]}_tutorial.json"
+            f"{TUTORIAL_DIR}/{Path(args.input).stem.split('_')[0]}_tutorial.json"
         )
 
     with open(args.input, "r") as file:
@@ -51,10 +52,18 @@ def main(args):
             jsonfile["sequences"][i]["visualElements"][0]["props"]["image1"][
                 "value"
             ] = slide_image
+        if "image2" in jsonfile["sequences"][i]["visualElements"][0]["props"]:
+            jsonfile["sequences"][i]["visualElements"][0]["props"]["image2"][
+                "value"
+            ] = slide_image
         if "text1" in jsonfile["sequences"][i]["visualElements"][0]["props"]:
             jsonfile["sequences"][i]["visualElements"][0]["props"]["text1"][
                 "value"
             ] = slide_text
+        if "text2" in jsonfile["sequences"][i]["visualElements"][0]["props"]:
+            jsonfile["sequences"][i]["visualElements"][0]["props"]["text1"][
+                "value"
+            ] = ""
 
     with open(args.output, "w") as out_file:
         json.dump(jsonfile, out_file, indent=4)

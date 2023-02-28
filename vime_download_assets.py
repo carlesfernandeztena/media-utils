@@ -10,16 +10,25 @@ import jq
 from vime_adapt_to_composer import remove_nlpmetadata
 
 # fmt: off
-PUBLIC_PATH = "/home/carles/src/vime/vime-renderer/public"
+PUBLIC_PATH = "/home/carles/src/vime-composer-service/renderer/public"
 ASSETS_DIR = "temp_assets/"
+MEDIA_UTILS_PATH = "/home/carles/src/media-utils"
 DOWNLOADABLE_EXTS = [".mp3", ".wav", ".webm", ".mp4", ".png", ".jpg", ".bmp", ".gif", ".jpeg", ".svg"]
 # fmt: on
 
 
 def download_asset(s3_asset: str, target_local_file: str) -> None:
+    print(f"    ...Downloading {Path(target_local_file).name}")
     output = subprocess.check_output(
         shlex.split(f"aws s3 cp {s3_asset} {target_local_file}")
     )
+
+
+def video_duration(video_file: str) -> float:
+    output = subprocess.check_output(
+        shlex.split(f"sh {MEDIA_UTILS_PATH}/vid_duration.sh {PUBLIC_PATH}/{video_file}")
+    )
+    return float(output)
 
 
 def is_downloadable(s3_asset: str) -> bool:
@@ -68,14 +77,30 @@ def main(args):
     # If global/sequences, take out the global/
     if "config" in jsonfile and "sequences" in jsonfile["config"]:
         jsonfile = jsonfile["config"]
+    if "job_status" in jsonfile and "sequences" in jsonfile["job_status"]["config"]:
+        jsonfile = jsonfile["job_status"]["config"]
 
     # remove NLP metadata fields
     jsonfile = remove_nlpmetadata(jsonfile)
 
+    # remove NLP metadata fields
+    jsonfile = replace_assets(jsonfile)
+
+    # update sequence durations
     N = int(jq.compile(".sequences | length").input(jsonfile).text())
-    for _ in range(N):
-        # remove NLP metadata fields
-        jsonfile = replace_assets(jsonfile)
+    for i in range(N):
+        if "cvUrl" in jsonfile["sequences"][i]["parameters"]["avatar"]:
+            cvurl = jsonfile["sequences"][i]["parameters"]["avatar"]["cvUrl"]
+            if len(cvurl) > 0:
+                jsonfile["sequences"][i]["parameters"]["duration"] = video_duration(
+                    cvurl
+                )
+        if "ttsUrl" in jsonfile["sequences"][i]["parameters"]["avatar"]:
+            ttsurl = jsonfile["sequences"][i]["parameters"]["avatar"]["ttsUrl"]
+            if len(ttsurl) > 0:
+                jsonfile["sequences"][i]["parameters"]["duration"] = video_duration(
+                    ttsurl
+                )
 
     with open(args.output, "w") as out_file:
         json.dump(jsonfile, out_file, indent=4)

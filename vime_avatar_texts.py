@@ -12,6 +12,8 @@ def main(args):
     with open(args.json, "r") as file:
         jsonfile = json.load(file)
     N = int(jq.compile(".sequences | length").input(jsonfile).text())
+    
+    print("AI actor scripts:")
     for i in range(N):
         avatar_text = (
             jq.compile(f".sequences[{i}].parameters.avatar.value")
@@ -19,6 +21,17 @@ def main(args):
             .text()
         )
         print(f" ({i+1}) {avatar_text}")
+
+    print("\nSlide texts:")
+    for i in range(N):
+        for j in range(3):
+            if f"text{j}" in jsonfile["sequences"][i]["visualElements"][0]["props"]:
+                text_j = (
+                    jq.compile(f".sequences[{i}].visualElements[0].props.text{j}.value")
+                    .input(jsonfile)
+                    .text()
+                )
+                print(f" ({i+1}.{j}) {text_j}")
     print()
 
 

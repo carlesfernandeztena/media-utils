@@ -8,15 +8,15 @@ from pathlib import Path
 import jq
 
 # fmt: off
-ASSETS_PATH = "/home/carles/src/vime/vime-renderer/public"
+PUBLIC_PATH = "/home/carles/src/vime-composer-service/renderer/public"
 MEDIA_UTILS_PATH = "/home/carles/src/media-utils"
-MUSIC = { "1": 1, "2": 2, "2b": 2, "3": 3, "3b": 3, "4": 3, "5": 7, "6": 4, "7": 8, "8": 9, "9": 9, "10": 2, "14":3, "17":1 }
+MUSIC = { "1": 1, "2": 2, "2b": 2, "3": 3, "3b": 3, "4": 3, "5": 7, "6": 4, "7": 8, "8": 9, "9": 9, "10": 2, "14":3, "15":11, "16":7, "17":1, "18":5, "19":8, "20":3, "21":4 }
 # fmt: on
 
 
 def video_duration(video_file: str) -> float:
     output = subprocess.check_output(
-        shlex.split(f"sh {MEDIA_UTILS_PATH}/vid_duration.sh {ASSETS_PATH}/{video_file}")
+        shlex.split(f"sh {MEDIA_UTILS_PATH}/vid_duration.sh {PUBLIC_PATH}/{video_file}")
     )
     return float(output)
 
