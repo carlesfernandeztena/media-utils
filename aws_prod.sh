@@ -7,6 +7,7 @@ GEN=$1
 
 # Get job_id, provide it to prod server
 curl --request GET --url https://mind.oxolo.com/api/generations/$GEN --header 'token: NAUaJc6VcNprWnC6frW2ErM4kupr7WgbeKvGrvSEjbUy2jFt7LLngqLVRTSb7ert' | jq .generation.cortex_composer_job_id | tr -d '"' > job
+echo JOB = "$(<job)"
 scp job ec2-user@development:/home/ec2-user/job
 
 # Get job from cortex
@@ -17,7 +18,7 @@ cortex get composer `cat job` -o json > temp.json
 cat temp.json | jq .job_status > ${GEN}.json
 rm temp.json job
 EOF
-de 
+
 # Copy the file back
 scp ec2-user@development:/home/ec2-user/$GEN.json .
 
