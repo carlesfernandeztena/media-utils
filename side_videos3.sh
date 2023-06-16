@@ -43,12 +43,13 @@ ffmpeg -y  \
   -map 0:a \
     ${TMP}
 
+FONTNAME=/var/lib/flatpak/runtime/org.kde.Platform/x86_64/5.15/f2a7e3e2908638acdd0c26a040a74531ed9c89b79826bca1fb27ebddb02ff8c1/files/share/fonts/gnu-free/FreeSans.ttf
 echo " :: Adding labels to mosaic"
 ffmpeg -hide_banner -loglevel error -y \
     -i ${TMP} \
-    -vf "drawtext=fontfile=/path/to/font.ttf:text='${TEXT1}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(1*w/3-text_w)/2:y=${POS_Y}, \
-        drawtext=fontfile=/path/to/font.ttf:text='${TEXT2}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(w-text_w)/2:y=${POS_Y}, \
-        drawtext=fontfile=/path/to/font.ttf:text='${TEXT3}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(5*w/3-text_w)/2:y=${POS_Y}" \
+    -vf "drawtext=fontfile=${FONTNAME}:text='${TEXT1}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(1*w/3-text_w)/2:y=${POS_Y}, \
+        drawtext=fontfile=${FONTNAME}:text='${TEXT2}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(w-text_w)/2:y=${POS_Y}, \
+        drawtext=fontfile=${FONTNAME}:text='${TEXT3}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(5*w/3-text_w)/2:y=${POS_Y}" \
     -codec:a copy \
     -codec:v libx264 -crf 18 -preset slow \
     ${OUT_VIDEO}

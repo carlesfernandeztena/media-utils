@@ -11,9 +11,9 @@ from vime_adapt_to_composer import remove_nlpmetadata
 
 # fmt: off
 PUBLIC_PATH = "/home/carles/src/vime-composer-service/renderer/public"
-ASSETS_DIR = "temp_assets/"
+ASSETS_DIR = ""
 MEDIA_UTILS_PATH = "/home/carles/src/media-utils"
-DOWNLOADABLE_EXTS = [".mp3", ".wav", ".webm", ".mp4", ".png", ".jpg", ".bmp", ".gif", ".jpeg", ".svg"]
+DOWNLOADABLE_EXTS = [".mp3", ".mov", ".wav", ".webm", ".mp4", ".png", ".jpg", ".bmp", ".gif", ".jpeg", ".svg"]
 # fmt: on
 
 
@@ -40,7 +40,7 @@ def is_downloadable(s3_asset: str) -> bool:
 
 def replace_assets(d, level: int = 1):
     """Iteratively replace S3 assets along the hierarchy"""
-    Path(f"{PUBLIC_PATH}/{ASSETS_DIR}").mkdir(parents=True, exist_ok=True)
+    # Path(f"{PUBLIC_PATH}/{ASSETS_DIR}").mkdir(parents=True, exist_ok=True)
 
     if isinstance(d, dict):
         for key in list(d):
@@ -51,10 +51,11 @@ def replace_assets(d, level: int = 1):
             ):
                 ##############################
                 # Download and replace asset
-                out_filename = f"{PUBLIC_PATH}/{ASSETS_DIR}/{Path(d[key]).name}"
+                # out_filename = f"{PUBLIC_PATH}/{ASSETS_DIR}/{Path(d[key]).name}"
+                out_filename = f"{PUBLIC_PATH}/{Path(d[key]).name}"
                 download_asset(d[key], out_filename)
                 # in json, only include path after "public/"
-                d[key] = f"{ASSETS_DIR}/{Path(d[key]).name}"
+                d[key] = f"{Path(d[key]).name}"
                 ##############################
             elif isinstance(d[key], dict) or isinstance(d[key], list):
                 d[key] = replace_assets(d[key], level + 1)

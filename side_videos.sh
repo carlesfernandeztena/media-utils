@@ -25,14 +25,14 @@ EXTENSION="${IN_VIDEO1##*.}"
 TEXT1=${IN_VIDEO1%.*}
 TEXT2=${IN_VIDEO2%.*}
 TMP=$(mktemp XXXXXX.${EXTENSION})
-if [ $5 == "up" ]; then
+if [ "$5" = "up" ]; then
     POS_Y="1*(h-text_h)/6"
 else
     POS_Y="5*(h-text_h)/6"
 fi
 
 echo " :: Getting video mosaic" # -hide_banner -loglevel error
-ffmpeg -hide_banner -loglevel error \
+ffmpeg -hide_banner -loglevel error -y \
   -i ${IN_VIDEO1_MOD} \
   -i ${IN_VIDEO2} \
   -filter_complex '[0:v]pad=iw*2:ih[int];[int][1:v]overlay=W/2:0[vid]' \
@@ -42,10 +42,11 @@ ffmpeg -hide_banner -loglevel error \
 
 
 echo " :: Adding labels to mosaic"
+FONTFILE="/usr/share/fonts/truetype/freefont/FreeSans.ttf"
 ffmpeg -hide_banner -loglevel error -y \
     -i ${TMP} \
-    -vf "drawtext=fontfile=/path/to/font.ttf:text='${TEXT1}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(1*w/2-text_w)/2:y=${POS_Y}, \
-        drawtext=fontfile=/path/to/font.ttf:text='${TEXT2}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(3*w/2-text_w)/2:y=${POS_Y}" \
+    -vf "drawtext=fontfile=${FONTFILE}:text='${TEXT1}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(1*w/2-text_w)/2:y=${POS_Y}, \
+        drawtext=fontfile=${FONTFILE}:text='${TEXT2}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=(3*w/2-text_w)/2:y=${POS_Y}" \
     -codec:a copy \
     -codec:v libx264 -crf 18 -preset slow \
     ${OUT_VIDEO}
