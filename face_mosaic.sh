@@ -84,12 +84,15 @@ for (( i=0; i<NUM_VIDEOS; i++ )); do
     CMD+="[${i}:v] setpts=PTS-STARTPTS, scale=${W}x${H} [v${i}]; "
 done
 CMD+="[base][v0] overlay=shortest=1 [tmp0]; "
-for (( i=1; i<NUM_VIDEOS; i++ )); do
+for (( i=1; i<NUM_VIDEOS-1; i++ )); do
     x=$((i%cols))
     y=$((i/cols))
     CMD+="[tmp$((i-1))][v${i}] overlay=shortest=1:x=$((x*W)):y=$((y*H)) [tmp${i}]; "
 done
-CMD+="\" -map \"[tmp$((NUM_VIDEOS-1))]\" -c:v libx264 -crf 18 -preset veryfast -map 0:a  ${TMP}"
+x=$((NUM_VIDEOS%cols))
+y=$((NUM_VIDEOS/cols))
+CMD+="[tmp$((NUM_VIDEOS-1))][v${NUM_VIDEOS}] overlay=shortest=1:x=$((x*W)):y=$((y*H)) \" "
+CMD+="-c:v libx264 -crf 18 -preset veryfast -map 0:a  ${TMP}"
 eval "${CMD}"
 
 #################################################################
