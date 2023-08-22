@@ -13,7 +13,8 @@ if [ "${FOLDER: -1}" == '/' ]; then
 fi
 V=( $(ls "$FOLDER") )
 NUM_VIDEOS=${#V[@]}
-rows=$(echo "sqrt($NUM_VIDEOS)" | bc); 
+rows=$(echo "${NUM_VIDEOS}" | awk '{print int(sqrt($1))}');
+#rows=$(echo "sqrt($NUM_VIDEOS)" | bc); # awk is more present than bc in servers
 cols=$(((NUM_VIDEOS+rows-1)/rows)) # ceil operation
 V1=${V[0]}
 
