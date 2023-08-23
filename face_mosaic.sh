@@ -8,6 +8,22 @@ fi
 FOLDER="$1"
 TEXT_WHERE="$2"
 
+get_size() {
+    if [ "$#" -ne 1 ]; then
+        echo "get_size() requires 1 argument: text_length"
+	exit 1
+    fi
+    TXT_LEN=${#1}
+    if [ ${TXT_LEN} -le 24 ]; then
+    	font_size=24
+    else
+	# 24->24, 60->6
+	font_size=$(((38000 - 583 * TXT_LEN) / 1000))
+    fi
+    echo "${font_size}"
+}
+
+
 if [ "${FOLDER: -1}" == '/' ]; then
     FOLDER=${FOLDER::-1}
 fi
@@ -38,7 +54,7 @@ echo " :: Extracting video faces from each one"
 mkdir -p "facecrop_${FOLDER}"
 for (( i=0; i<NUM_VIDEOS; i++ ));
 do
-	eval vid_face_crop.sh "${FOLDER}/${V[i]}"
+	bash -c "vid_face_crop.sh ${FOLDER}/${V[i]}"
 done
 
 #################################################################
@@ -47,7 +63,7 @@ done
 declare -a STEMS
 for (( i=0; i<NUM_VIDEOS; i++ ));
 do
-	STEMS[i]="${V[i]}"
+	STEMS[i]="${V[i]%.*}"
 done
 EXTENSION="${V1##*.}"
 TMP=$(mktemp "XXXXXX.${EXTENSION}")
@@ -55,9 +71,9 @@ TMP=$(mktemp "XXXXXX.${EXTENSION}")
 declare -a X Y POS_X POS_Y
 for (( i=0; i<NUM_VIDEOS; i++ ));
 do
-	X[i]=$((i%cols))
+    X[i]=$((i%cols))
     Y[i]=$((i/cols))
-    POS_X[i]="($((2*X[i]+1))*w/2-text_w)/${cols}"
+    POS_X[i]="($((2*X[i]+1))*w/2/${cols}-text_w/2)"
     if [ "$TEXT_WHERE" == "down" ]; then
         POS_Y[i]="(h-text_h)*$((5+Y[i]*6))/$((6*rows))"
     else
@@ -89,11 +105,13 @@ for (( i=1; i<NUM_VIDEOS-1; i++ )); do
     y=$((i/cols))
     CMD+="[tmp$((i-1))][v${i}] overlay=shortest=1:x=$((x*W)):y=$((y*H)) [tmp${i}]; "
 done
-x=$((NUM_VIDEOS%cols))
-y=$((NUM_VIDEOS/cols))
-CMD+="[tmp$((NUM_VIDEOS-1))][v${NUM_VIDEOS}] overlay=shortest=1:x=$((x*W)):y=$((y*H)) \" "
+x=$(((NUM_VIDEOS-1)%cols))
+y=$(((NUM_VIDEOS-1)/cols))
+CMD+="[tmp$((NUM_VIDEOS-2))][v$((NUM_VIDEOS-1))] overlay=shortest=1:x=$((x*W)):y=$((y*H))\" "
 CMD+="-c:v libx264 -crf 18 -preset veryfast -map 0:a  ${TMP}"
-eval "${CMD}"
+
+#echo $CMD
+bash -c "${CMD}"
 
 #################################################################
 echo " :: Adding labels to mosaic"
@@ -101,11 +119,17 @@ echo " :: Adding labels to mosaic"
 OUT_VIDEO="mosaic_${FOLDER}.${EXTENSION}"
 CMD="ffmpeg -hide_banner -loglevel error -y -i ${TMP} -vf \""
 FONTFILE="/usr/share/fonts/truetype/freefont/FreeSans.ttf"
-for (( i=0; i<NUM_VIDEOS; i++ )); do
-    CMD+="drawtext=fontfile=${FONTFILE}:text='${STEMS[i]}':fontcolor=white:fontsize=24:box=1:boxcolor=black@0.5:boxborderw=5:x=${POS_X[i]}:y=${POS_Y[i]}, "
+for (( i=0; i<NUM_VIDEOS-1; i++ )); do
+    FONTSIZE=$(get_size ${STEMS[i]})
+    CMD+="drawtext=fontfile=${FONTFILE}:text='${STEMS[i]}':fontcolor=white:fontsize=${FONTSIZE}:box=1:boxcolor=black@0.5:boxborderw=5:x=${POS_X[i]}:y=${POS_Y[i]}, "
 done
-CMD+="\" -codec:a copy -codec:v libx264 -crf 18 -preset veryfast ${OUT_VIDEO}"
-eval "${CMD}"
-rm -rf "$TMP" "${FOLDER}/audio" "facecrop_${FOLDER}"
+FONTSIZE=$(get_size ${STEMS[$((NUM_VIDEOS-1))]})
+CMD+="drawtext=fontfile=${FONTFILE}:text='${STEMS[$((NUM_VIDEOS-1))]}':fontcolor=white:fontsize=${FONTSIZE}:box=1:boxcolor=black@0.5:boxborderw=5:x=${POS_X[$((NUM_VIDEOS-1))]}:y=${POS_Y[$((NUM_VIDEOS-1))]}\" "
+CMD+="-codec:a copy -codec:v libx264 -crf 18 -preset veryfast ${OUT_VIDEO}"
+
+bash -c "${CMD}"
+if [ -f ${OUT_VIDEO} ]; then
+    rm -rf "$TMP" "${FOLDER}/audio" "facecrop_${FOLDER}"
+fi
 
 echo " :: Created ${OUT_VIDEO}"
