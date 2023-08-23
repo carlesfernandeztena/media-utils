@@ -1,0 +1,4 @@
+# face-detect requirements
+opencv-python-headless~=4.5
+numpy~=1.22
+onnxruntime-gpu~=1.11 # for cuda11.x-cudnn8
