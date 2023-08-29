@@ -1,7 +1,7 @@
 # face-detect requirements
 opencv-python-headless~=4.5
 numpy~=1.22
-onnxruntime~=1.11 
+onnxruntime-gpu~=1.11 # for cuda11.x-cudnn8
 
 # youtube-dl
 yt-dlp~=2023.7.6 

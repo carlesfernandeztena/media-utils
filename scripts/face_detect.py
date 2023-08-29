@@ -1,11 +1,7 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3
 import sys
 from pathlib import Path
 
-# Requires:
-# opencv-python-headless (e.g. ~=4.5)
-# numpy (e.g. ~=1.22),
-# onnxruntime(-gpu) (e.g. ~=1.11 if cuda11.5-cudnn8)
 import cv2
 import numpy as np
 import onnxruntime as rt
