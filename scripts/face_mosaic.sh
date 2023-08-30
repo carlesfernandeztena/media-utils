@@ -82,8 +82,8 @@ do
 done
 
 
-W=300
-H=300
+W=400
+H=400
 TOT_W=$((W*cols))
 TOT_H=$((H*rows))
 
