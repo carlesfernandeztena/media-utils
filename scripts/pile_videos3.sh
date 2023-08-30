@@ -42,6 +42,7 @@ ffmpeg -y  \
                    [2:v][0v]scale2ref=oh*mdar:ih[2v][0v];
                    [0v][1v][2v]vstack=3,scale='2*trunc(iw/2)':'2*trunc(ih/2)'[vid]" \
   -map '[vid]'  -c:v libx264 -crf 18 -preset ultrafast -map 0:a -vsync 2 \
+  .
     ${TMP}
 
 echo " :: Adding labels to mosaic"
