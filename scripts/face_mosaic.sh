@@ -27,7 +27,7 @@ get_size() {
 if [ "${FOLDER: -1}" == '/' ]; then
     FOLDER=${FOLDER::-1}
 fi
-V=( $(ls "$FOLDER") )
+V=( $(ls "$FOLDER" -r) )
 NUM_VIDEOS=${#V[@]}
 rows=$(echo "${NUM_VIDEOS}" | awk '{print int(sqrt($1))}');
 #rows=$(echo "sqrt($NUM_VIDEOS)" | bc); # awk is more present than bc in servers
@@ -120,15 +120,15 @@ OUT_VIDEO="mosaic_${FOLDER}.${EXTENSION}"
 CMD="ffmpeg -hide_banner -loglevel error -y -i ${TMP} -vf \""
 FONTFILE="/usr/share/fonts/truetype/freefont/FreeSans.ttf"
 for (( i=0; i<NUM_VIDEOS-1; i++ )); do
-    FONTSIZE=$(get_size ${STEMS[i]})
+    FONTSIZE=$(get_size "${STEMS[i]}")
     CMD+="drawtext=fontfile=${FONTFILE}:text='${STEMS[i]}':fontcolor=white:fontsize=${FONTSIZE}:box=1:boxcolor=black@0.5:boxborderw=5:x=${POS_X[i]}:y=${POS_Y[i]}, "
 done
-FONTSIZE=$(get_size ${STEMS[$((NUM_VIDEOS-1))]})
+FONTSIZE=$(get_size "${STEMS[$((NUM_VIDEOS-1))]}")
 CMD+="drawtext=fontfile=${FONTFILE}:text='${STEMS[$((NUM_VIDEOS-1))]}':fontcolor=white:fontsize=${FONTSIZE}:box=1:boxcolor=black@0.5:boxborderw=5:x=${POS_X[$((NUM_VIDEOS-1))]}:y=${POS_Y[$((NUM_VIDEOS-1))]}\" "
 CMD+="-codec:a copy -codec:v libx264 -crf 18 -preset veryfast ${OUT_VIDEO}"
 
 bash -c "${CMD}"
-if [ -f ${OUT_VIDEO} ]; then
+if [ -f "${OUT_VIDEO}" ]; then
     rm -rf "$TMP" "${FOLDER}/audio" "facecrop_${FOLDER}"
 fi
 

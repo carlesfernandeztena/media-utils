@@ -37,7 +37,7 @@ x, y, w, h = (
     (bbox[3] - bbox[1]) * height,
 )
 
-wp = int(max(w, h)) * 1.3
+wp = int(max(w, h)) * 1.2
 xp = int(x + 0.5 * (w - wp))
 yp = int(y + 0.5 * (h - wp))
 print(f"{xp} {yp} {wp} {wp}")
