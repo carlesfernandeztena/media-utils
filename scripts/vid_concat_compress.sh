@@ -11,7 +11,7 @@ fi
 if [ "${DIR: -1}" == '/' ]; then
     DIR=${DIR::-1}
 fi
-for f in "$DIR"/*; do echo "file '${DIR}/$f'"; done > files.txt
+for f in "$DIR"/*; do echo "file '$f'"; done > files.txt
 ffmpeg -f concat -i files.txt -c:v libx265 -crf 26 -preset fast -c:a aac -b:a 128k $DIR.mp4
 rm files.txt
 echo ":: Done!"
