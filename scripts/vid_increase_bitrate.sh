@@ -15,7 +15,7 @@ echo "Old bitrate: ${OLD_BITRATE} ($IN)"
 EXT="${IN##*.}"
 OUTPUT="${FILENAME}_higher_bitrate.${EXT}"
 #ffmpeg -y -hide_banner -v warning -i "${IN}" -c:v libvpx-vp9 -pix_fmt yuva420p -crf 18 "$OUTPUT"
-ffmpeg -y -hide_banner -v warning -i "${IN}" -c:v libx264 -x264-params "nal-hrd=cbr" -b:v 1.1M -minrate 1.1M -maxrate 1.1M -bufsize 2M  "$OUTPUT"
+ffmpeg -y -hide_banner -v warning -i "${IN}" -c:v libx264 -x264-params "nal-hrd=cbr" -b:v 2M -minrate 2M -maxrate 2M -bufsize 2M  "$OUTPUT"
 
 # Print new bitrate
 NEW_BITRATE=$(ffprobe -i "$OUTPUT" -v 0 -show_entries format=bit_rate -of compact=p=0:nk=1)
